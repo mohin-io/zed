@@ -31,6 +31,7 @@ pub struct TaffyLayoutEngine {
     taffy: TaffyTree<NodeContext>,
     absolute_layout_bounds: FxHashMap<LayoutId, Bounds<Pixels>>,
     computed_layouts: FxHashSet<LayoutId>,
+    layout_bounds_scratch_space: SmallVec<[LayoutId; 64]>,
 }
 
 const EXPECT_MESSAGE: &str = "we should avoid taffy layout errors by construction if possible";
@@ -43,6 +44,7 @@ impl TaffyLayoutEngine {
             taffy,
             absolute_layout_bounds: FxHashMap::default(),
             computed_layouts: FxHashSet::default(),
+            layout_bounds_scratch_space: SmallVec::new(),
         }
     }
 
@@ -168,7 +170,7 @@ impl TaffyLayoutEngine {
         //
 
         if !self.computed_layouts.insert(id) {
-            let mut stack = SmallVec::<[LayoutId; 64]>::new();
+            let mut stack = &mut self.layout_bounds_scratch_space;
             stack.push(id);
             while let Some(id) = stack.pop() {
                 self.absolute_layout_bounds.remove(&id);
