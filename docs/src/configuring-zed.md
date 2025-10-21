@@ -21,6 +21,26 @@ Although most projects will only need one settings file at the root, you can add
 
 The syntax for configuration files is a super-set of JSON that allows `//` comments.
 
+### Separate settings per release channel
+
+When you install multiple Zed builds (Stable, Preview, Nightly) on the same machine, they all read from the same default directories (`%APPDATA%\Zed` on Windows, `~/.config/zed` on Linux, and `~/Library/Application Support/Zed` on macOS). To give each channel its own configuration, launch it with a dedicated data directory via the CLI:
+
+```bash
+# macOS/Linux example: create (or reuse) a channel-specific directory
+mkdir -p "$HOME/.local/share/Zed Nightly"
+
+# launch Zed Nightly with its own data+config directory
+zed --user-data-dir "$HOME/.local/share/Zed Nightly"
+```
+
+Zed will create a `config` subdirectory inside the path you supply. Your channel-specific `settings.json`, `keymap.json`, and other files live in that folder (for example, `~/.local/share/Zed Nightly/config/settings.json`). Repeat the launch command with different target paths for each channel you want to isolate—for example:
+
+- **Windows:** Add `--user-data-dir "%LOCALAPPDATA%\Zed Nightly"` to the shortcut that starts Zed Nightly. The channel's settings will be stored under `%LOCALAPPDATA%\Zed Nightly\config\`.
+- **macOS:** Update the command you use to launch the Preview or Nightly app bundle: `"/Applications/Zed Nightly.app/Contents/MacOS/zed" --user-data-dir "$HOME/Library/Application Support/Zed Nightly"`.
+- **Linux:** Choose any writable directory, such as `~/.local/share/zed-nightly`, and reuse the `zed --user-data-dir <path>` command above.
+
+Once each channel points at a different directory, changes to a channel's settings, themes, or extensions no longer leak across your other installations.
+
 ## Default settings
 
 You can find the default settings for your current Zed by running {#action zed::OpenDefaultSettings} from the command palette.
